@@ -1,0 +1,207 @@
+import * as React from 'react'
+import { StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native'
+import { ScreenComponent } from '../../navigation/RootNavigator'
+import { useColor } from '../../hooks/useColor'
+import { Text } from '../../components/Text'
+import { globalStyles } from '../../config/theme'
+import { TypingIndicator } from './TypingIndicator'
+import { getRandomNumber } from '../../services/utils'
+import { useSelector } from '../../redux/useSelector'
+import { currentLocaleSelector } from '../../redux/selectors'
+import { Locale } from '../../resources/translations'
+import { ChatMessage } from '../../types/chat'
+import { chatFlowByLocale, initialChatStepId } from '../../optional/chat'
+import { usePrevious } from '../../hooks/usePrevious'
+
+const ChatScreen: ScreenComponent<'Chat'> = () => {
+  const locale = useSelector(currentLocaleSelector) as Locale
+  const flow = chatFlowByLocale?.[locale]
+
+  const [stepId, setStepId] = React.useState('')
+  const previousStepId = usePrevious(stepId)
+
+  const [history, setHistory] = React.useState<ChatMessage[]>([])
+  const [isTyping, setIsTyping] = React.useState(true)
+
+  const sendMessage = (message: ChatMessage) => {
+    setHistory((current) => [...current, message])
+  }
+
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+
+  const scrollViewRef = React.useRef<ScrollView | null>(null)
+  const onContentSizeChange = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true })
+    }
+  }
+
+  const options = flow?.[stepId]?.options ?? []
+
+  const sendMessagesRecursively = (messages: ChatMessage[], index = 0) => {
+    const delay = getRandomNumber(MIN_DELAY, MAX_DELAY)
+
+    timeoutRef.current = setTimeout(() => {
+      sendMessage(messages[index])
+      const nextIndex = index + 1
+      if (nextIndex >= messages.length) {
+        setIsTyping(false)
+      } else {
+        sendMessagesRecursively(messages, nextIndex)
+      }
+    }, delay)
+  }
+
+  React.useEffect(() => {
+    setIsTyping(true)
+
+    if (!flow || !initialChatStepId) {
+      return
+    }
+
+    if (!stepId) {
+      setStepId(initialChatStepId)
+      return
+    }
+
+    if (!flow[stepId] && previousStepId) {
+      setStepId(previousStepId)
+      return
+    }
+
+    const messagesToSend: ChatMessage[] = flow[stepId].messages.map((item) => ({
+      message: item,
+      type: 'received',
+    }))
+
+    sendMessagesRecursively(messagesToSend)
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [stepId])
+
+  return (
+    <View style={styles.screen}>
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.scrollView}
+        onContentSizeChange={onContentSizeChange}
+      >
+        {history.map((message, i) => (
+          <Message key={`message${i}`} message={message.message} type={message.type} />
+        ))}
+
+        {isTyping ? <TypingMessage /> : null}
+      </ScrollView>
+
+      {options.map((option) => {
+        const onPress = () => {
+          setIsTyping(true)
+          sendMessage({ message: option.label, type: 'sent' })
+          setStepId(option.nextStepId)
+        }
+        return (
+          <OptionButton
+            key={`${stepId}${option.label}`}
+            onPress={onPress}
+            label={option.label}
+            hidden={isTyping}
+          />
+        )
+      })}
+    </View>
+  )
+}
+
+export default ChatScreen
+
+const Message = ({ message, type }: ChatMessage) => {
+  const { palette } = useColor()
+  const style = type === 'sent' ? styles.sentMessage : styles.receivedMessage
+  const backgroundColor = type === 'sent' ? palette.primary.base : palette.basic.base
+
+  return (
+    <View style={[style, globalStyles.shadow, { backgroundColor }]}>
+      <Text enableTranslate={false}>{message}</Text>
+    </View>
+  )
+}
+
+const TypingMessage = () => {
+  const { palette } = useColor()
+
+  return (
+    <View
+      style={[styles.receivedMessage, globalStyles.shadow, { backgroundColor: palette.basic.base }]}
+    >
+      <TypingIndicator />
+    </View>
+  )
+}
+
+const OptionButton = ({
+  label,
+  onPress,
+  hidden,
+}: {
+  label: string
+  onPress: () => void
+  hidden: boolean
+}) => {
+  const { palette } = useColor()
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.option,
+        globalStyles.shadow,
+        { backgroundColor: palette.secondary.base },
+        hidden && styles.hidden,
+      ]}
+    >
+      <Text enableTranslate={false}>{label}</Text>
+    </TouchableOpacity>
+  )
+}
+
+const MIN_DELAY = 500
+const MAX_DELAY = 2000
+
+const styles = StyleSheet.create({
+  screen: {
+    paddingHorizontal: 12,
+  },
+  scrollView: {
+    marginBottom: 'auto',
+    height: '100%',
+  },
+  sentMessage: {
+    borderRadius: 20,
+    marginBottom: 8,
+    padding: 12,
+    minWidth: 120,
+    maxWidth: '80%',
+    alignSelf: 'flex-end',
+  },
+  receivedMessage: {
+    borderRadius: 20,
+    marginBottom: 8,
+    padding: 12,
+    minWidth: 120,
+    alignSelf: 'flex-start',
+    maxWidth: '80%',
+  },
+  option: {
+    borderRadius: 20,
+    marginBottom: 8,
+    padding: 12,
+    width: '100%',
+  },
+  hidden: {
+    opacity: 0,
+  },
+})

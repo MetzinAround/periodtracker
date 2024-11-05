@@ -1,5 +1,9 @@
 export type ValueOf<T> = T[keyof T]
 
+export const getRandomNumber = (min: number, max: number) => {
+  return Math.random() * (max - min) + min
+}
+
 export function recordToArray<T extends object>(obj?: T) {
   if (!obj) {
     return []

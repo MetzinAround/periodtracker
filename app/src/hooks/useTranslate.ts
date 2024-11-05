@@ -13,6 +13,7 @@ import { currentLocaleSelector } from '../redux/selectors'
 import React from 'react'
 import { setLocale } from '../redux/actions'
 import { useSelector } from '../redux/useSelector'
+import { chatTranslations } from '../optional/chat'
 
 let initLocale = defaultLocale
 
@@ -58,6 +59,7 @@ export const allTranslations = combineTranslations([
   (appTranslations as unknown) as TranslationObject,
   (localeTranslations as unknown) as TranslationObject,
   (themeTranslations as unknown) as TranslationObject,
+  (chatTranslations as unknown) as TranslationObject,
   // flowerTranslations,
   // customComponentsTranslations,
 ])

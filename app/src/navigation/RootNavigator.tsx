@@ -85,6 +85,7 @@ const loggedInLinking: LinkingOptions<GlobalParamList> = {
           Encyclopedia: '',
           Articles: 'articles/:subcategoryId',
           Help: 'help',
+          Chat: 'chat',
         },
       },
       // ===== Settings ===== //
