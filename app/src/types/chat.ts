@@ -1,18 +1,24 @@
 import { Locale } from '../resources/translations'
+import { ChatAction } from '../resources/translations/chat'
 
 export interface ChatStep {
   messages: string[]
   options: ChatOption[]
 }
 
-export type ChatFlow = Record<string, ChatStep>
+export type ChatOption =
+  | {
+      label: string
+      nextStepId: string
+      action?: never
+    }
+  | {
+      label: string
+      nextStepId?: never
+      action: ChatAction
+    }
 
-export type ChatFlowByLocale = Record<Locale, ChatFlow>
-
-export interface ChatOption {
-  label: string
-  nextStepId: string
-}
+export type ChatActionMap = Record<ChatAction, () => void>
 
 export interface ChatMessage {
   message: string
@@ -22,3 +28,7 @@ export interface ChatMessage {
 export type ChatTranslations = {
   chat: string
 }
+
+export type ChatFlow = Record<string, ChatStep>
+
+export type ChatFlowByLocale = Record<Locale, ChatFlow>

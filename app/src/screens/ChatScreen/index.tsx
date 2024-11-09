@@ -9,13 +9,15 @@ import { getRandomNumber } from '../../services/utils'
 import { useSelector } from '../../redux/useSelector'
 import { currentLocaleSelector } from '../../redux/selectors'
 import { Locale } from '../../resources/translations'
-import { ChatMessage } from '../../types/chat'
+import { ChatMessage, ChatOption } from '../../types/chat'
 import { chatFlowByLocale, initialChatStepId } from '../../optional/chat'
 import { usePrevious } from '../../hooks/usePrevious'
+import { useChatActions } from '../../resources/translations/chat'
 
-const ChatScreen: ScreenComponent<'Chat'> = () => {
+const ChatScreen: ScreenComponent<'Chat'> = ({ navigation }) => {
   const locale = useSelector(currentLocaleSelector) as Locale
   const flow = chatFlowByLocale?.[locale]
+  const chatActions = useChatActions(navigation)
 
   const [stepId, setStepId] = React.useState('')
   const previousStepId = usePrevious(stepId)
@@ -39,6 +41,11 @@ const ChatScreen: ScreenComponent<'Chat'> = () => {
   const options = flow?.[stepId]?.options ?? []
 
   const sendMessagesRecursively = (messages: ChatMessage[], index = 0) => {
+    if (!messages.length) {
+      setIsTyping(false)
+      return
+    }
+
     const delay = getRandomNumber(MIN_DELAY, MAX_DELAY)
 
     timeoutRef.current = setTimeout(() => {
@@ -83,6 +90,25 @@ const ChatScreen: ScreenComponent<'Chat'> = () => {
     }
   }, [stepId])
 
+  const getOnOptionPress = (option: ChatOption) => {
+    if (option?.action) {
+      return chatActions[option?.action]
+    }
+
+    const next = option.nextStepId
+    if (!next) {
+      return () => {
+        //
+      }
+    }
+
+    return () => {
+      setIsTyping(true)
+      sendMessage({ message: option.label, type: 'sent' })
+      setStepId(next)
+    }
+  }
+
   return (
     <View style={styles.screen}>
       <ScrollView
@@ -94,24 +120,17 @@ const ChatScreen: ScreenComponent<'Chat'> = () => {
           <Message key={`message${i}`} message={message.message} type={message.type} />
         ))}
 
-        {isTyping ? <TypingMessage /> : null}
+        <TypingMessage visible={isTyping} />
       </ScrollView>
 
-      {options.map((option) => {
-        const onPress = () => {
-          setIsTyping(true)
-          sendMessage({ message: option.label, type: 'sent' })
-          setStepId(option.nextStepId)
-        }
-        return (
-          <OptionButton
-            key={`${stepId}${option.label}`}
-            onPress={onPress}
-            label={option.label}
-            hidden={isTyping}
-          />
-        )
-      })}
+      {options.map((option) => (
+        <OptionButton
+          key={`${stepId}${option.label}`}
+          onPress={getOnOptionPress(option)}
+          label={option.label}
+          hidden={isTyping}
+        />
+      ))}
     </View>
   )
 }
@@ -130,8 +149,12 @@ const Message = ({ message, type }: ChatMessage) => {
   )
 }
 
-const TypingMessage = () => {
+const TypingMessage = ({ visible }: { visible: boolean }) => {
   const { palette } = useColor()
+
+  if (!visible) {
+    return null
+  }
 
   return (
     <View
