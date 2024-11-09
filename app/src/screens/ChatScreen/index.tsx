@@ -1,10 +1,7 @@
 import * as React from 'react'
-import { StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, ScrollView, View } from 'react-native'
 import { ScreenComponent } from '../../navigation/RootNavigator'
-import { useColor } from '../../hooks/useColor'
-import { Text } from '../../components/Text'
-import { globalStyles } from '../../config/theme'
-import { TypingIndicator } from './TypingIndicator'
+
 import { getRandomNumber } from '../../services/utils'
 import { useSelector } from '../../redux/useSelector'
 import { currentLocaleSelector } from '../../redux/selectors'
@@ -13,6 +10,7 @@ import { ChatMessage, ChatOption } from '../../types/chat'
 import { chatFlowByLocale, initialChatStepId } from '../../optional/chat'
 import { usePrevious } from '../../hooks/usePrevious'
 import { useChatActions } from '../../resources/translations/chat'
+import { Message, OptionButton, TypingMessage } from './ChatMessages'
 
 const ChatScreen: ScreenComponent<'Chat'> = ({ navigation }) => {
   const locale = useSelector(currentLocaleSelector) as Locale
@@ -25,10 +23,6 @@ const ChatScreen: ScreenComponent<'Chat'> = ({ navigation }) => {
   const [history, setHistory] = React.useState<ChatMessage[]>([])
   const [isTyping, setIsTyping] = React.useState(true)
 
-  const sendMessage = (message: ChatMessage) => {
-    setHistory((current) => [...current, message])
-  }
-
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const scrollViewRef = React.useRef<ScrollView | null>(null)
@@ -40,6 +34,12 @@ const ChatScreen: ScreenComponent<'Chat'> = ({ navigation }) => {
 
   const options = flow?.[stepId]?.options ?? []
 
+  // ========== Send 1 outgoing message ========== //
+  const sendMessage = (message: ChatMessage) => {
+    setHistory((current) => [...current, message])
+  }
+
+  // ========== Send incoming messages ========== //
   const sendMessagesRecursively = (messages: ChatMessage[], index = 0) => {
     if (!messages.length) {
       setIsTyping(false)
@@ -59,6 +59,7 @@ const ChatScreen: ScreenComponent<'Chat'> = ({ navigation }) => {
     }, delay)
   }
 
+  // ========== On Change Step ========== //
   React.useEffect(() => {
     setIsTyping(true)
 
@@ -90,6 +91,7 @@ const ChatScreen: ScreenComponent<'Chat'> = ({ navigation }) => {
     }
   }, [stepId])
 
+  // ========== Option Press ========== //
   const getOnOptionPress = (option: ChatOption) => {
     if (option?.action) {
       return chatActions[option?.action]
@@ -137,60 +139,6 @@ const ChatScreen: ScreenComponent<'Chat'> = ({ navigation }) => {
 
 export default ChatScreen
 
-const Message = ({ message, type }: ChatMessage) => {
-  const { palette } = useColor()
-  const style = type === 'sent' ? styles.sentMessage : styles.receivedMessage
-  const backgroundColor = type === 'sent' ? palette.primary.base : palette.basic.base
-
-  return (
-    <View style={[style, globalStyles.shadow, { backgroundColor }]}>
-      <Text enableTranslate={false}>{message}</Text>
-    </View>
-  )
-}
-
-const TypingMessage = ({ visible }: { visible: boolean }) => {
-  const { palette } = useColor()
-
-  if (!visible) {
-    return null
-  }
-
-  return (
-    <View
-      style={[styles.receivedMessage, globalStyles.shadow, { backgroundColor: palette.basic.base }]}
-    >
-      <TypingIndicator />
-    </View>
-  )
-}
-
-const OptionButton = ({
-  label,
-  onPress,
-  hidden,
-}: {
-  label: string
-  onPress: () => void
-  hidden: boolean
-}) => {
-  const { palette } = useColor()
-
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={[
-        styles.option,
-        globalStyles.shadow,
-        { backgroundColor: palette.secondary.base },
-        hidden && styles.hidden,
-      ]}
-    >
-      <Text enableTranslate={false}>{label}</Text>
-    </TouchableOpacity>
-  )
-}
-
 const MIN_DELAY = 500
 const MAX_DELAY = 2000
 
@@ -201,30 +149,5 @@ const styles = StyleSheet.create({
   scrollView: {
     marginBottom: 'auto',
     height: '100%',
-  },
-  sentMessage: {
-    borderRadius: 20,
-    marginBottom: 8,
-    padding: 12,
-    minWidth: 120,
-    maxWidth: '80%',
-    alignSelf: 'flex-end',
-  },
-  receivedMessage: {
-    borderRadius: 20,
-    marginBottom: 8,
-    padding: 12,
-    minWidth: 120,
-    alignSelf: 'flex-start',
-    maxWidth: '80%',
-  },
-  option: {
-    borderRadius: 20,
-    marginBottom: 8,
-    padding: 12,
-    width: '100%',
-  },
-  hidden: {
-    opacity: 0,
   },
 })
