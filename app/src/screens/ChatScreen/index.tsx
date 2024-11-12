@@ -7,9 +7,8 @@ import { useSelector } from '../../redux/useSelector'
 import { currentLocaleSelector } from '../../redux/selectors'
 import { Locale } from '../../resources/translations'
 import { ChatMessage, ChatOption } from '../../types/chat'
-import { chatFlowByLocale, initialChatStepId } from '../../optional/chat'
+import { chatFlowByLocale, initialChatStepId, useChatActions } from '../../optional/chat'
 import { usePrevious } from '../../hooks/usePrevious'
-import { useChatActions } from '../../resources/translations/chat'
 import { Message, OptionButton, TypingMessage } from './ChatMessages'
 
 const ChatScreen: ScreenComponent<'Chat'> = ({ navigation }) => {
