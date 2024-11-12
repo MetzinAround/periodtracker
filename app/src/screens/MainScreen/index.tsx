@@ -19,6 +19,9 @@ import { useFetchSurvey } from '../../hooks/useFetchSurvey'
 import { useLoading, useStopLoadingEffect } from '../../contexts/LoadingProvider'
 import { AvatarMessageProvider } from '../../contexts/AvatarMessageContext'
 import { IS_ANDROID } from '../../services/device'
+import { useToggle } from '../../hooks/useToggle'
+import { FlowerButton } from '../../components/Flower/FlowerButton'
+import { FlowerModal } from '../../components/Flower/FlowerModal'
 
 const MainScreen: ScreenComponent<'Home'> = (props) => {
   const { setLoading } = useLoading()
@@ -48,6 +51,8 @@ const MainScreenInner: ScreenComponent<'Home'> = ({ navigation, route }) => {
 
   const { state, step, onTopLeftLayout, onWheelLayout, dispatch: tutorialDispatch } = useTutorial()
 
+  const [flowerModalVisible, toggleFlowerModal] = useToggle()
+
   // Auto start tutorial due to route params
   useFocusEffect(
     React.useCallback(() => {
@@ -66,6 +71,7 @@ const MainScreenInner: ScreenComponent<'Home'> = ({ navigation, route }) => {
   const wheelHidden = state.isPlaying && step !== 'wheel' && step !== 'wheel_button'
   const centerCardHidden = state.isPlaying && step !== 'wheel' && step !== 'center_card'
   const carouselHidden = state.isPlaying && !['track', 'summary', 'stars'].includes(step ?? '')
+  const flowerHidden = state.isPlaying && step !== 'flower'
 
   const goToCalendar = () => navigation.navigate('Calendar')
 
@@ -74,10 +80,22 @@ const MainScreenInner: ScreenComponent<'Home'> = ({ navigation, route }) => {
       <View style={styles.screen}>
         <View style={styles.body} onLayout={onBodyLayout}>
           <View style={styles.topLeft} onLayout={onTopLeftLayout}>
-            <CircleProgress onPress={goToCalendar} style={circleProgressHidden && styles.hidden} />
-            <TouchableOpacity onPress={goToCalendar} style={circleProgressHidden && styles.hidden}>
-              <Text>calendar</Text>
-            </TouchableOpacity>
+            <View style={styles.topButtons}>
+              <View>
+                <CircleProgress
+                  onPress={goToCalendar}
+                  style={circleProgressHidden && styles.hidden}
+                />
+                <TouchableOpacity
+                  onPress={goToCalendar}
+                  style={circleProgressHidden && styles.hidden}
+                >
+                  <Text>calendar</Text>
+                </TouchableOpacity>
+              </View>
+              <FlowerButton onPress={toggleFlowerModal} style={flowerHidden && styles.hidden} />
+            </View>
+
             <Avatar style={avatarHidden && styles.hidden} />
           </View>
 
@@ -101,6 +119,7 @@ const MainScreenInner: ScreenComponent<'Home'> = ({ navigation, route }) => {
       {selectedItem && (
         <DayModal visible={dayModalVisible} toggleVisible={toggleDayModal} data={selectedItem} />
       )}
+      <FlowerModal visible={flowerModalVisible} toggleVisible={toggleFlowerModal} isStatic />
     </>
   )
 }
@@ -123,6 +142,10 @@ const styles = StyleSheet.create({
     height: '100%',
     flexDirection: 'column',
     alignItems: 'center',
+    zIndex: 999, // Keep Avatar(Message) above Wheel
+  },
+  topButtons: {
+    flexDirection: 'row',
     zIndex: 999, // Keep Avatar(Message) above Wheel
   },
   wheelContainer: {

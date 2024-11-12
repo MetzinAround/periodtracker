@@ -9,6 +9,7 @@ import { authReducer } from './authReducer'
 import { contentReducer } from './contentReducer'
 import { predictionReducer } from './predictionReducer'
 import { helpCenterReducer } from './helpCenterReducer'
+import { flowerReducer } from './flowerReducer'
 
 const reducer = combineReducers({
   analytics: analyticsReducer,
@@ -19,7 +20,7 @@ const reducer = combineReducers({
   prediction: predictionReducer,
   helpCenters: helpCenterReducer,
   // Optional Modules
-  // flower: flowerReducer, TODO: Flower state should be saved per user
+  flower: flowerReducer,
 })
 
 // @ts-expect-error TODO:

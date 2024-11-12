@@ -34,6 +34,7 @@ export type TutorialStepConfig = {
   text: string
   textBoxTop?: boolean
   feature?: React.FC
+  disabled?: boolean
 }
 
 export type TutorialConfig = Record<TutorialStep, TutorialStepConfig>
@@ -168,6 +169,12 @@ export const TutorialProvider = ({ children }: React.PropsWithChildren) => {
   const stepConfig = tutorialConfig?.[step]
 
   React.useEffect(() => {
+    if (stepConfig && stepConfig.disabled) {
+      // Skip
+      dispatch({ type: 'continue' })
+      return
+    }
+
     if (stepConfig) {
       rotationAngle.value = withTiming(stepConfig.rotationAngle)
       translateX.value = withTiming(stepConfig.translationX)

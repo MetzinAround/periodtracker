@@ -9,6 +9,7 @@ export type ColorSchemeBase = {
   borderColor: string
   inputBackgroundColor: string
   videoTabBackgroundColor: string
+  flowerIconColor: string
   modalBackdropColor: string
   backgroundOverlayColor: string
   errorColor: string
@@ -23,6 +24,7 @@ export type PaletteStatus =
   | 'primary'
   | 'secondary'
   | 'tertiary'
+  | 'quaternary'
   | 'neutral'
   | 'basic'
   | 'danger'
@@ -58,6 +60,7 @@ const schemes: ColorScheme = {
     borderColor: '#f0f0f0',
     inputBackgroundColor: '#f1f1f1',
     videoTabBackgroundColor: '#ffe6e3',
+    flowerIconColor: '#E34893',
     modalBackdropColor: 'rgba(0,0,0,0.8)',
     backgroundOverlayColor: 'transparent',
     errorColor: '#ff0000',
@@ -72,6 +75,7 @@ const schemes: ColorScheme = {
     borderColor: '#323237',
     inputBackgroundColor: '#323237',
     videoTabBackgroundColor: '#4a0c2e',
+    flowerIconColor: '#E34893',
     modalBackdropColor: 'rgba(50,50,50,0.8)',
     backgroundOverlayColor: 'rgba(0,0,0,0.5)',
     errorColor: '#ff0000',
@@ -103,6 +107,13 @@ const palettes: Record<ColorSchemeName, Palette> = {
       shadow: '#1169BF',
       dark: '#0344A5',
       text: '#3DA4DD',
+    },
+    quaternary: {
+      base: '#FFDF00',
+      highlight: '#FFFFFF',
+      shadow: '#EBB305',
+      dark: '#B68B17',
+      text: '#FFDF00',
     },
     neutral: {
       base: '#91d9e2',
@@ -154,6 +165,13 @@ const palettes: Record<ColorSchemeName, Palette> = {
       shadow: '#1169BF',
       dark: '#0344A5',
       text: '#3DA4DD',
+    },
+    quaternary: {
+      base: '#FFDF00',
+      highlight: '#FFFFFF',
+      shadow: '#EBB305',
+      dark: '#B68B17',
+      text: '#FFDF00',
     },
     neutral: {
       base: '#53b8c8',

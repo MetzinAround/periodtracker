@@ -2,8 +2,18 @@ import { LayoutRectangle } from 'react-native'
 import { TutorialStepConfig } from './TutorialContext'
 import { ActivityCardFeature, CalendarFeature, NotesFeature } from './components/TutorialFeature'
 import { UIConfig } from '../../config/UIConfig'
+import { FlowerTutorialCard } from '../../components/Flower/FlowerTutorialCard'
+import { FLOWER_ENABLED } from '../../optional/flower'
 
-export type TutorialTwoStep = 'track' | 'summary' | 'stars' | 'activity' | 'dairy' | 'calendar'
+export type TutorialTwoStep =
+  | 'track'
+  | 'summary'
+  | 'stars'
+  | 'activity'
+  | 'dairy'
+  | 'calendar'
+  // Optional
+  | 'flower'
 
 export const tutorialTwoSteps: TutorialTwoStep[] = [
   'track',
@@ -12,6 +22,8 @@ export const tutorialTwoSteps: TutorialTwoStep[] = [
   'activity',
   'dairy',
   'calendar',
+  // Optional
+  'flower',
 ]
 
 const SELECTED_SCALE = 1.2
@@ -87,6 +99,16 @@ export const getTutorialTwoConfig = ({
       title: 'tutorial_14_content',
       text: 'tutorial_14',
       feature: CalendarFeature,
+    },
+    // Optional
+    flower: {
+      rotationAngle: 0,
+      translationX: screenWidth / 2 - 30 + 52, // + Circle progress width,
+      translationY: 0,
+      title: 'tutorial_flower_content',
+      text: 'tutorial_flower',
+      feature: FlowerTutorialCard,
+      disabled: !FLOWER_ENABLED, // Optional
     },
   }
 }

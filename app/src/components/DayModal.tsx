@@ -28,6 +28,8 @@ import { isFutureDate } from '../services/dateUtils'
 import { useFormatDate } from '../hooks/useFormatDate'
 import { useLoading } from '../contexts/LoadingProvider'
 import { analytics } from '../services/firebase'
+import { FlowerModal } from './Flower/FlowerModal'
+import { useFlowerProgress } from './Flower/useFlowerProgress'
 // import { usePredictDay } from "../contexts/PredictionProvider";
 
 export const DayModal = ({ data, visible, toggleVisible }: { data: DayData } & ModalProps) => {
@@ -51,6 +53,10 @@ export const DayModal = ({ data, visible, toggleVisible }: { data: DayData } & M
   const currentCycleInfo = useTodayPrediction()
   const inputDayStr = moment(inputDay).format('YYYY-MM-DD')
   const todayStr = moment().format('YYYY-MM-DD')
+
+  const { flowerModalVisible, toggleFlowerModal, incFlowerProgress } = useFlowerProgress(
+    inputDayStr,
+  )
 
   // flower
   // const cardAnswersToday = useSelector((state) =>
@@ -209,6 +215,8 @@ export const DayModal = ({ data, visible, toggleVisible }: { data: DayData } & M
       return
     }
 
+    incFlowerProgress()
+
     if (addNewCycleHistory) {
       if (selectedDayInfo.onPeriod) {
         reduxDispatch(
@@ -218,7 +226,6 @@ export const DayModal = ({ data, visible, toggleVisible }: { data: DayData } & M
             periodDay: true,
           }),
         )
-        // incFlowerProgress();
       } else {
         dispatch({
           type: 'add-new-cycle-history',
@@ -233,7 +240,6 @@ export const DayModal = ({ data, visible, toggleVisible }: { data: DayData } & M
             periodDay: true,
           }),
         )
-        // incFlowerProgress();
       }
     } else {
       if (selectedDayInfo.onPeriod) {
@@ -244,7 +250,6 @@ export const DayModal = ({ data, visible, toggleVisible }: { data: DayData } & M
             periodDay: true,
           }),
         )
-        // incFlowerProgress();
       } else {
         checkForDay()
       }
@@ -283,18 +288,22 @@ export const DayModal = ({ data, visible, toggleVisible }: { data: DayData } & M
   }
 
   return (
-    <Modal visible={visible} toggleVisible={toggleVisible} style={styles.modal}>
-      <LaunchTutorialButton toggleVisible={toggleVisible} />
-      <Text style={styles.title}>user_input_instructions</Text>
-      <Text style={styles.description}>share_period_details_heading</Text>
+    <>
+      <Modal visible={visible} toggleVisible={toggleVisible} style={styles.modal}>
+        <LaunchTutorialButton toggleVisible={toggleVisible} />
+        <Text style={styles.title}>user_input_instructions</Text>
+        <Text style={styles.description}>share_period_details_heading</Text>
 
-      <IconButton size={160} text={formatMomentDayMonth(inputDay)} status={'basic'} />
+        <IconButton size={160} text={formatMomentDayMonth(inputDay)} status={'basic'} />
 
-      <View style={styles.buttons} pointerEvents="box-none">
-        <IconButton onPress={onYesPress} size={100} text={'Yes'} status={'danger'} />
-        <IconButton onPress={onNoPress} size={100} text={'No'} />
-      </View>
-    </Modal>
+        <View style={styles.buttons} pointerEvents="box-none">
+          <IconButton onPress={onYesPress} size={100} text={'Yes'} status={'danger'} />
+          <IconButton onPress={onNoPress} size={100} text={'No'} />
+        </View>
+      </Modal>
+
+      <FlowerModal visible={flowerModalVisible} toggleVisible={toggleFlowerModal} />
+    </>
   )
 }
 
