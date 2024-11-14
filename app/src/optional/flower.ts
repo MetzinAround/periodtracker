@@ -7,7 +7,7 @@ let maxFlowerProgress: 3 | 5 | 7 = 3
 let FLOWER_ENABLED = false
 
 try {
-  const flower = require('../resources/optional/flower')
+  const flower = require('../resources/features/flower')
   flowerTranslations = flower.flowerTranslations
   maxFlowerProgress = flower.maxFlowerProgress
   flowerAssets = flower.flowerAssets

@@ -12,7 +12,7 @@ let useChatActions: (
 let CHAT_ENABLED = false
 
 try {
-  const chat = require('../resources/optional/chat')
+  const chat = require('../resources/features/chat')
   initialChatStepId = chat.initialChatStepId
   chatFlowByLocale = chat.chatFlowByLocale
   chatTranslations = chat.chatTranslations
