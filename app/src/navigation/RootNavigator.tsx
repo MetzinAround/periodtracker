@@ -21,6 +21,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { analytics } from '../services/firebase'
 import { useMessaging } from '../hooks/useMessaging'
 import { useAvailableLocaleEffect } from '../hooks/useTranslate'
+import { ChatStackParamList } from './stacks/ChatStack'
 
 export type RootStackParamList = MainStackParamList & AuthStackParamList
 
@@ -29,6 +30,7 @@ export type GlobalParamList = MainStackParamList &
   ProfileStackParamList &
   HomeStackParamList &
   EncyclopediaStackParamList &
+  ChatStackParamList &
   SettingsStackParamList
 
 export type ScreenProps<T extends keyof GlobalParamList> = NativeStackScreenProps<
@@ -85,7 +87,6 @@ const loggedInLinking: LinkingOptions<GlobalParamList> = {
           Encyclopedia: '',
           Articles: 'articles/:subcategoryId',
           Help: 'help',
-          Chat: 'chat',
         },
       },
       // ===== Settings ===== //

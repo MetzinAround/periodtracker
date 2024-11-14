@@ -12,11 +12,13 @@ import { UserIcon } from '../components/icons/UserIcon'
 import { IS_IOS } from '../services/device'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useColor } from '../hooks/useColor'
+import ChatStack, { ChatStackParamList } from './stacks/ChatStack'
 
 export type MainStackParamList = {
   profile: NavigatorScreenParams<ProfileStackParamList>
   home: NavigatorScreenParams<HomeStackParamList>
   encyclopedia: NavigatorScreenParams<EncyclopediaStackParamList>
+  chat: NavigatorScreenParams<ChatStackParamList>
   settings: NavigatorScreenParams<SettingsStackParamList>
 }
 
@@ -81,6 +83,18 @@ function MainNavigator() {
           tabBarIcon: ({ focused, size }) => (
             <TabIcon focused={focused} accessibilityLabel={'encyclopedia'}>
               <FontAwesome size={size} name={'book'} color={'#fff'} />
+            </TabIcon>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name={'chat'}
+        component={ChatStack}
+        options={{
+          ...options,
+          tabBarIcon: ({ focused, size }) => (
+            <TabIcon focused={focused} accessibilityLabel={'chat'}>
+              <FontAwesome size={size} name={'comment'} color={'#fff'} />
             </TabIcon>
           ),
         }}
