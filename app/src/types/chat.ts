@@ -1,5 +1,5 @@
 import { Locale } from '../resources/translations'
-import { ChatAction } from '../resources/translations/chat'
+import { ChatAction } from '../resources/features/chat'
 
 export interface ChatStep {
   messages: string[]

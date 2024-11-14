@@ -8,7 +8,7 @@ let chatFlowByLocale: ChatFlowByLocale | undefined
 let chatTranslations: ChatTranslations | object = {}
 let useChatActions: (
   navigation: NativeStackNavigationProp<GlobalParamList, 'Chat', undefined>,
-) => ChatActionMap = () => ({})
+) => Partial<ChatActionMap> = () => ({})
 let CHAT_ENABLED = false
 
 try {

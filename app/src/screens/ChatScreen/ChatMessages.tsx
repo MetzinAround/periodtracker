@@ -40,7 +40,7 @@ export const OptionButton = ({
   hidden,
 }: {
   label: string
-  onPress: () => void
+  onPress?: () => void
   hidden: boolean
 }) => {
   const { palette } = useColor()
